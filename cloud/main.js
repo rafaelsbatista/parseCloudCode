@@ -28,3 +28,26 @@ Parse.Cloud.define("isMeditationViewed", function(request, response) {
 		}
 	});
 });
+
+Parse.Cloud.define("getMeditationsViewed", function(request, response) {
+	var query = new Parse.Query("UserView");
+	query.equalTo("user", {
+        __type: "Pointer",
+        className: "_User",
+        objectId: request.params.userId
+    });
+	
+	query.find({
+		success: function(results) {
+			var ids =  [];
+			for (var i = 0 ; i < results.length ; i++) {
+				ids.push(results[i].get("meditation").id);
+			}
+			
+			response.success(ids);
+		},
+		error: function() {
+			response.error("Could not execute query");
+		}
+	});
+});
